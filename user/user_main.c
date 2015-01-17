@@ -11,7 +11,6 @@
 #include "driver/pcd8544.h"
 
 #define user_procTaskPeriod      1000
-
 static volatile os_timer_t lcd_timer;
 
 void user_init(void);
@@ -21,49 +20,52 @@ static void loop(os_event_t *events);
 static void ICACHE_FLASH_ATTR
 loop(os_event_t *events) {
   static bool toggle = true;
-  static bool firstTime = true;
-  if (firstTime) {
+  static uint32_t loopIterations = 0;
+  if (loopIterations < 2) {
     // I wonder why the calls in user_init doesn't 'take'
     PCD8544_initLCD();
     os_delay_us(50000);
     PCD8544_lcdClear();
-    firstTime = false;
-  }
-  os_printf("Updating display\n\r");
-  // Draw a Box
-  PCD8544_drawLine();
-  int a=0;
-  PCD8544_gotoXY(17,1);
-  // Put text in Box
-  PCD8544_lcdString("ESP8266");
-  PCD8544_gotoXY(24,3);
-  if (toggle){
-    PCD8544_lcdCharacter('H');
-    PCD8544_lcdCharacter('E');
-    PCD8544_lcdCharacter('L');
-    PCD8544_lcdCharacter('L');
-    PCD8544_lcdCharacter('O');
-    PCD8544_lcdCharacter(' ');
-    PCD8544_lcdCharacter('=');
-    // Draw + at this position
-    PCD8544_gotoXY(10,3);
-    PCD8544_lcdCharacter('=');
-    os_delay_us(50000);
+    //PCD8544_lcdXbmImage(oshw_84_48_bits);
+    loopIterations+=1;
+    os_printf("Initiating display: %d\n\r", loopIterations);
   } else {
+    os_printf("Updating display\n\r");
+    // Draw a Box
+    PCD8544_drawLine();
+    int a=0;
+    PCD8544_gotoXY(17,1);
+    // Put text in Box
+    PCD8544_lcdString("ESP8266");
     PCD8544_gotoXY(24,3);
-    PCD8544_lcdCharacter('h');
-    PCD8544_lcdCharacter('e');
-    PCD8544_lcdCharacter('l');
-    PCD8544_lcdCharacter('l');
-    PCD8544_lcdCharacter('o');
-    PCD8544_lcdCharacter(' ');
-    PCD8544_lcdCharacter('-');
-    // Draw - at this position
-    PCD8544_gotoXY(10,3);
-    PCD8544_lcdCharacter('-');
-    os_delay_us(50000);
+    if (toggle){
+      PCD8544_lcdCharacter('H');
+      PCD8544_lcdCharacter('E');
+      PCD8544_lcdCharacter('L');
+      PCD8544_lcdCharacter('L');
+      PCD8544_lcdCharacter('O');
+      PCD8544_lcdCharacter(' ');
+      PCD8544_lcdCharacter('=');
+      // Draw + at this position
+      PCD8544_gotoXY(10,3);
+      PCD8544_lcdCharacter('=');
+      os_delay_us(50000);
+    } else {
+      PCD8544_gotoXY(24,3);
+      PCD8544_lcdCharacter('h');
+      PCD8544_lcdCharacter('e');
+      PCD8544_lcdCharacter('l');
+      PCD8544_lcdCharacter('l');
+      PCD8544_lcdCharacter('o');
+      PCD8544_lcdCharacter(' ');
+      PCD8544_lcdCharacter('-');
+      // Draw - at this position
+      PCD8544_gotoXY(10,3);
+      PCD8544_lcdCharacter('-');
+      os_delay_us(50000);
+    }
+    toggle = !toggle;
   }
-  toggle = !toggle;
   os_timer_disarm(&lcd_timer);
   os_timer_arm(&lcd_timer, user_procTaskPeriod, 0);
 }

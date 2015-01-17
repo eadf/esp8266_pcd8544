@@ -11,10 +11,10 @@
 #include "ctype.h"
 #include "gpio.h"
 
-//#define PIN_RESET 4  // LCD RST .... Pin 1
-#define PIN_RESET 0  // LCD RST .... Pin 1
-//#define PIN_SCE   5  // LCD CE  .... Pin 2
-#define PIN_SCE   2  // LCD CE  .... Pin 2
+#define PIN_RESET 4  // LCD RST .... Pin 1
+//#define PIN_RESET 0  // LCD RST .... Pin 1
+#define PIN_SCE   5  // LCD CE  .... Pin 2
+//#define PIN_SCE   2  // LCD CE  .... Pin 2
 #define PIN_DC   12  // LCD DC  .... Pin 3
 #define PIN_SDIN 13  // LCD Din .... Pin 4
 #define PIN_SCLK 14  // LCD Clk .... Pin 5
@@ -24,12 +24,11 @@
 
 #define LOW       0
 #define HIGH      1
-#define LCD_C     LOW
-#define LCD_D     HIGH
+#define LCD_CMD   LOW
+#define LCD_DATA  HIGH
 
 #define LCD_X     84
 #define LCD_Y     48
-#define LCD_CMD   0
 
 #define CLOCK_HIGH_TIME 14 // 14 us
 
@@ -137,7 +136,6 @@ static const uint8_t ASCII[][5] =
     ,{0x00, 0x06, 0x09, 0x09, 0x06} // 7f →
 };
 
-
 void ICACHE_FLASH_ATTR
 PCD8544_printBinary(uint32_t data){
   int i = 0;
@@ -157,20 +155,20 @@ PCD8544_printBinary(uint32_t data){
 void ICACHE_FLASH_ATTR
 PCD8544_gotoXY(int x, int y)
 {
-  PCD8544_lcdWrite8( 0, 0x80 | x);  // Column.
-  PCD8544_lcdWrite8( 0, 0x40 | y);  // Row.
+  PCD8544_lcdWrite8( LCD_CMD, 0x80 | x);  // Column.
+  PCD8544_lcdWrite8( LCD_CMD, 0x40 | y);  // Row.
 }
 
 
 void ICACHE_FLASH_ATTR
 PCD8544_lcdCharacter(char character){
-  PCD8544_lcdWrite8(LCD_D, 0x00);
+  PCD8544_lcdWrite8(LCD_DATA, 0x00);
   int index = 0;
   for (; index < 5; index++)
   {
-    PCD8544_lcdWrite8(LCD_D, ASCII[character - 0x20][index]);
+    PCD8544_lcdWrite8(LCD_DATA, ASCII[character - 0x20][index]);
   }
-  PCD8544_lcdWrite8(LCD_D, 0x00);
+  PCD8544_lcdWrite8(LCD_DATA, 0x00);
 }
 
 void ICACHE_FLASH_ATTR
@@ -184,7 +182,7 @@ void ICACHE_FLASH_ATTR
 PCD8544_lcdClear(void){
   int index = 0;
   for (; index < LCD_X * LCD_Y / 8; index++){
-    PCD8544_lcdWrite8(LCD_D, 0x00);
+    PCD8544_lcdWrite8(LCD_DATA, 0x00);
   }
 }
 
@@ -195,33 +193,23 @@ PCD8544_shiftOut8(bool msbFirst, uint8_t data){
   if (msbFirst) {
     for (bit = 7; bit>=0; bit--) {
       dataBit = (data>>bit)&1;
-      //os_printf("C=0, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       os_delay_us(CLOCK_HIGH_TIME);
       GPIO_OUTPUT_SET(PIN_SCLK, 0);
       GPIO_OUTPUT_SET(PIN_SDIN, dataBit);
       os_delay_us(CLOCK_HIGH_TIME);
-
-      //os_printf("C=1, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       GPIO_OUTPUT_SET(PIN_SCLK, 1);
       os_delay_us(CLOCK_HIGH_TIME);
-
-      //os_printf("C=0, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       GPIO_OUTPUT_SET(PIN_SCLK, 0);
     }
   } else {
     for (bit = 0; bit<=7; bit++) {
       dataBit = (data>>bit)&1;
-      //os_printf("C=0, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       os_delay_us(CLOCK_HIGH_TIME);
       GPIO_OUTPUT_SET(PIN_SCLK, 0);
       GPIO_OUTPUT_SET(PIN_SDIN, dataBit);
       os_delay_us(CLOCK_HIGH_TIME);
-
-      //os_printf("C=1, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       GPIO_OUTPUT_SET(PIN_SCLK, 1);
       os_delay_us(CLOCK_HIGH_TIME);
-
-      //os_printf("C=0, D="); os_printf(dataBit?"1":"0"); os_printf("\n");
       GPIO_OUTPUT_SET(PIN_SCLK, 0);
     }
   }
@@ -239,25 +227,25 @@ PCD8544_lcdWrite8(bool dc, uint8_t data){
 
 void ICACHE_FLASH_ATTR
 PCD8544_drawLine(void) {
-  unsigned char  j;
+  uint8_t  j;
   for(j=0; j<84; j++) { // top
     PCD8544_gotoXY(j,0);
-    PCD8544_lcdWrite8(1,0x01);
+    PCD8544_lcdWrite8(LCD_DATA,0x01);
   }
   for(j=0; j<84; j++) { //Bottom
 
     PCD8544_gotoXY(j,5);
-    PCD8544_lcdWrite8(1,0x80);
+    PCD8544_lcdWrite8(LCD_DATA,0x80);
   }
   for(j=0; j<6; j++) {// Right
 
     PCD8544_gotoXY(83,j);
-    PCD8544_lcdWrite8(1,0xff);
+    PCD8544_lcdWrite8(LCD_DATA,0xff);
   }
   for(j=0; j<6; j++) {// Left
 
     PCD8544_gotoXY(0,j);
-    PCD8544_lcdWrite8(1,0xff);
+    PCD8544_lcdWrite8(LCD_DATA,0xff);
   }
 }
 
@@ -266,32 +254,28 @@ PCD8544_drawLine(void) {
 void ICACHE_FLASH_ATTR
 PCD8544_init(void)
 {
-  // pins: 4,5,0,12,13
-
-  //set gpio0 as gpio pin
-
-  //PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4 );
-  PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0 );
-  //PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5 );
-  PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2 );
+  PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);
+  //PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
+  PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);
+  //PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U,  FUNC_GPIO12);
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U,  FUNC_GPIO13);
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U,  FUNC_GPIO14);
 
   //disable pull downs
-  //PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO4_U);
-  PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO0_U);
-  //PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO5_U);
-  PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO2_U);
+  PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO4_U);
+  //PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO0_U);
+  PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO5_U);
+  //PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO2_U);
   PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTDI_U);
   PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTCK_U);
   PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
 
   //disable pull ups
-  //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO4_U);
-  PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO0_U);
-  //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
-  PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
+  PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO4_U);
+  //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO0_U);
+  PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
+  //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
   PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDI_U);
   PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTCK_U);
   PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);
@@ -319,10 +303,21 @@ PCD8544_initLCD(void) {
   PCD8544_lcdWrite8( LCD_CMD, 0x04 );  // Set Temp coefficent. //0x04
   PCD8544_lcdWrite8( LCD_CMD, 0x14 );  // LCD bias mode 1:48. //0x13
   PCD8544_lcdWrite8( LCD_CMD, 0x0C );  // LCD in normal mode. 0x0d for inverse
-  PCD8544_lcdWrite8( LCD_C, 0x20);
-  PCD8544_lcdWrite8( LCD_C, 0x0C);
+  PCD8544_lcdWrite8( LCD_CMD, 0x20);
+  PCD8544_lcdWrite8( LCD_CMD, 0x0C);
   os_delay_us(100000);
   PCD8544_lcdClear();
   os_delay_us(10000);
+  os_printf("--------------------------------------\n");
+  os_printf("-Initiated LCD display with these pins:\n");
+  os_printf("--------------------------------------\n");
+  os_printf(" LCD RST Pin 1 <=> GPIO%d\n", PIN_RESET);
+  os_printf(" LCD CE  Pin 2 <=> GPIO%d\n", PIN_SCE);
+  os_printf(" LCD DC  Pin 3 <=> GPIO%d\n", PIN_DC);
+  os_printf(" LCD Din Pin 4 <=> GPIO%d\n", PIN_SDIN);
+  os_printf(" LCD Clk Pin 5 <=> GPIO%d\n", PIN_SCLK);
+  os_printf(" Some ESP-12 boards have GPIO4 & GPIO5 reversed\n\n", PIN_SCLK);
+
+
 }
 

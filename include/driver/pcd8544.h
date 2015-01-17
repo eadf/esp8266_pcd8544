@@ -13,6 +13,12 @@
 #include "ctype.h"
 #include "c_types.h"
 
+/**
+ * Draws a full screen image.
+ * The image must be exactly 528 bytes.
+ * (84+filler * 48) bits
+ */
+void PCD8544_lcdXbmImage(uint8_t *image);
 void PCD8544_lcdClear(void);
 void PCD8544_lcdCharacter(char character);
 /**
