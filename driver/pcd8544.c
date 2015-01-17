@@ -35,6 +35,7 @@
 void PCD8544_lcdWrite8(bool dc, uint8_t data);
 void PCD8544_shiftOut8(bool msbFirst, uint8_t data);
 void PCD8544_printBinary(uint32_t data);
+uint8_t PCD8544_pixelAt(uint8_t *image, uint8_t x, uint8_t y);
 
 static const uint8_t ASCII[][5] =
 {
@@ -164,8 +165,7 @@ void ICACHE_FLASH_ATTR
 PCD8544_lcdCharacter(char character){
   PCD8544_lcdWrite8(LCD_DATA, 0x00);
   int index = 0;
-  for (; index < 5; index++)
-  {
+  for (; index < 5; index++) {
     PCD8544_lcdWrite8(LCD_DATA, ASCII[character - 0x20][index]);
   }
   PCD8544_lcdWrite8(LCD_DATA, 0x00);
@@ -183,6 +183,46 @@ PCD8544_lcdClear(void){
   int index = 0;
   for (; index < LCD_X * LCD_Y / 8; index++){
     PCD8544_lcdWrite8(LCD_DATA, 0x00);
+  }
+}
+
+/**
+ * This does *not* work yet
+ */
+uint8_t ICACHE_FLASH_ATTR
+PCD8544_pixelAt(uint8_t *image, uint8_t x, uint8_t y){
+  int aByte = (11*y+x)>>0x3;
+  uint8_t aBit = 7-((11*y+x) & 0x7);
+  return (image[aByte] >> aBit) &1;
+}
+
+/**
+ * This does *not* work yet
+ */
+void ICACHE_FLASH_ATTR
+PCD8544_lcdXbmImage(uint8_t *image){
+  int row = 0;
+  int col = 0;
+  int rowBit = 0;
+  uint8_t c = 0;
+  for (row = 0; row<6; row++) { // byte sized row
+    for (col=0; col<84; col++) {
+      PCD8544_gotoXY(col,row);
+      c = 0;
+      for (rowBit = 7; rowBit>=0; rowBit--) {
+        c = c << 1;
+        c |= PCD8544_pixelAt(image,col,row*8+rowBit);
+      }
+      PCD8544_lcdWrite8(LCD_DATA, c);
+    }
+  }
+}
+
+void ICACHE_FLASH_ATTR
+PCD8544_lcdImage(uint8_t *image){
+  int index = 0;
+  for (; index < LCD_X * LCD_Y / 8; index++){
+    PCD8544_lcdWrite8(LCD_DATA, image[index]);
   }
 }
 
@@ -317,7 +357,6 @@ PCD8544_initLCD(void) {
   os_printf(" LCD Din Pin 4 <=> GPIO%d\n", PIN_SDIN);
   os_printf(" LCD Clk Pin 5 <=> GPIO%d\n", PIN_SCLK);
   os_printf(" Some ESP-12 boards have GPIO4 & GPIO5 reversed\n\n", PIN_SCLK);
-
 
 }
 
