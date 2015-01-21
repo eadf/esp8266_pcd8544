@@ -19,3 +19,5 @@ Clk Pin 5 | GPIO14
 Some ESP-12 have GPIO4 & GPIO5 reversed.
 
 I don't know if it is required but i put 1KΩ resistors on each gpio pin, and it does not seem to cause any problems. 
+
+Take a look at [esp_mqtt_lcd](https://github.com/eadf/esp_mqtt_lcd) to see an example on how this project can be used as a library module (git subtree) in your own project.
