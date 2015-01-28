@@ -48,7 +48,7 @@ loop(os_event_t *events) {
     int a=0;
     PCD8544_gotoXY(17,1);
     // Put text in Box
-    PCD8544_lcdString("ESP8266");
+    PCD8544_lcdPrint("ESP8266");
     PCD8544_gotoXY(24,3);
     if (toggle){
       PCD8544_lcdCharacter('H');
