@@ -26,23 +26,17 @@ typedef struct {
   uint8_t sclkPin;
 } PCD8544_Settings;
 
-/**
- * Draws a full screen image.
- * The image must be exactly 528 bytes.
- * (84+filler * 48) bits
- */
-void PCD8544_lcdXbmImage(uint8_t *image);
 void PCD8544_lcdImage(uint8_t *image);
 void PCD8544_lcdClear(void);
 void PCD8544_lcdCharacter(char character);
 /**
  * Writes a null terminated string
  */
-void PCD8544_lcdString(char *characters);
+void PCD8544_lcdPrint(char *characters);
 /**
  * debug prints a binary to console
  */
-void PCD8544printBinary(uint32_t data);
+void PCD8544_printBinary(uint32_t data);
 void PCD8544_gotoXY(int x, int y);
 void PCD8544_drawLine(void);
 

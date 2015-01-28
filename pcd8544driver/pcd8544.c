@@ -294,7 +294,7 @@ PCD8544_lcdCharacter(char character) {
 }
 
 void ICACHE_FLASH_ATTR
-PCD8544_lcdString(char *characters) {
+PCD8544_lcdPrint(char *characters) {
   while (*characters) {
     PCD8544_lcdCharacter(*characters++);
   }
