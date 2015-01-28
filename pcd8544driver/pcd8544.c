@@ -3,6 +3,7 @@
  */
 
 #include "driver/pcd8544.h"
+#include "easygpio/easygpio.h"
 
 #include "osapi.h"
 #include "ets_sys.h"
@@ -154,122 +155,6 @@ PCD8544_printBinary(uint32_t data){
   }
 }
 
-/**
- * Sets each port found in the gpioMask as a GPIO.
- *  e.g. gpioMask=1 (bit 0 raised) will set PERIPHS_IO_MUX_GPIO0_U as FUNC_GPIO0
- */
-bool ICACHE_FLASH_ATTR
-PCD8544_enableGPIOs(uint32_t gpioMask) {
-  {
-    int i,numberOfPins=0;
-    for (i=0; i<32; i++){
-      numberOfPins += (gpioMask & 1<<i)?1:0;
-    }
-    if (numberOfPins!=5) {
-      os_printf("PCD8544_enableGPIOs Error: you must specify exactly 5 unique pin numbers\n");
-      return false;
-    }
-  }
-
-  if (gpioMask & 1<<6) {
-    os_printf("PCD8544_enableGPIOs Error: There is no GPIO6, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<7) {
-    os_printf("PCD8544_enableGPIOs Error: There is no GPIO7, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<8) {
-    os_printf("PCD8544_enableGPIOs Error: There is no GPIO8, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<11) {
-    os_printf("PCD8544_enableGPIOs Error: There is no GPIO11, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<16) {
-    os_printf("PCD8544_enableGPIOs Error: GPIO16 not implemented yet\n");
-    return false;
-  }
-  if (gpioMask>>17) {
-    os_printf("PCD8544_enableGPIOs Error: GPIO17 and up does not exist. Check your code\n");
-    return false;
-  }
-
-  if (gpioMask & 1<<0) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO0_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO0_U);
-    //os_printf("Enabled GPIO0\n");
-  }
-  if (gpioMask & 1<<1) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_U0TXD_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0TXD_U);
-    //os_printf("Enabled GPIO1\n");
-  }
-  if (gpioMask & 1<<2) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO2_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
-    //os_printf("Enabled GPIO2\n");
-  }
-  if (gpioMask & 1<<3) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_GPIO3);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_U0RXD_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0RXD_U);
-    //os_printf("Enabled GPIO3\n");
-  }
-  if (gpioMask & 1<<4) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO4_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO4_U);
-    //os_printf("Enabled GPIO4\n");
-  }
-  if (gpioMask & 1<<5) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO5_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
-    //os_printf("Enabled GPIO5\n");
-  }
-  if (gpioMask & 1<<9) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_SD_DATA2_U, FUNC_GPIO9);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_SD_DATA2_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_SD_DATA2_U);
-    //os_printf("Enabled GPIO9\n");
-  }
-  if (gpioMask & 1<<10) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_SD_DATA3_U, FUNC_GPIO10);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_SD_DATA3_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_SD_DATA3_U);
-    //os_printf("Enabled GPIO10\n");
-  }
-  if (gpioMask & 1<<12) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTDI_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDI_U);
-    //os_printf("Enabled GPIO12\n");
-  }
-  if (gpioMask & 1<<13) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_GPIO13);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTCK_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTCK_U);
-    //os_printf("Enabled GPIO13\n");
-  }
-  if (gpioMask & 1<<14) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);
-    //os_printf("Enabled GPIO14\n");
-  }
-  if (gpioMask & 1<<15) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_GPIO15);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTDO_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDO_U);
-    //os_printf("Enabled GPIO15\n");
-  }
-}
-
 // PCD8544_gotoXY routine to position cursor
 // x - range: 0 to 84
 // y - range: 0 to 5
@@ -404,8 +289,18 @@ PCD8544_init(PCD8544_Settings *settings) {
     pinSclk  = settings->sclkPin;
   }
 
-  // Define each used pin as a GPIO
-  if (!PCD8544_enableGPIOs(1<<pinReset|1<<pinSce|1<<pinDc|1<<pinSdin|1<<pinSclk)) {
+
+  if (easygpio_countBits(1<<pinReset|1<<pinSce|1<<pinDc|1<<pinSdin|1<<pinSclk)!=5) {
+    os_printf("PCD8544_init Error: you must specify exactly 5 unique pin numbers\n");
+    return;
+  }
+
+  // Define each used pin as a GPIO output
+  if (!(easygpio_setupAsOutput(pinReset) &&
+        easygpio_setupAsOutput(pinSce) &&
+        easygpio_setupAsOutput(pinDc) &&
+        easygpio_setupAsOutput(pinSdin) &&
+        easygpio_setupAsOutput(pinSclk))) {
     return;
   }
 
