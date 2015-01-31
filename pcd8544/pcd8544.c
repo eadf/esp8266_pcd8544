@@ -2,14 +2,12 @@
  *
  */
 
-#include "driver/pcd8544.h"
+#include "pcd8544/pcd8544.h"
 #include "easygpio/easygpio.h"
-
 #include "osapi.h"
 #include "ets_sys.h"
 #include "os_type.h"
 #include "gpio.h"
-#include "ctype.h"
 #include "gpio.h"
 
 // These default pin definitions can be changed to any valid GPIO pin.
@@ -289,7 +287,6 @@ PCD8544_init(PCD8544_Settings *settings) {
     pinSclk  = settings->sclkPin;
   }
 
-
   if (easygpio_countBits(1<<pinReset|1<<pinSce|1<<pinDc|1<<pinSdin|1<<pinSclk)!=5) {
     os_printf("PCD8544_init Error: you must specify exactly 5 unique pin numbers\n");
     return;
@@ -311,8 +308,8 @@ PCD8544_init(PCD8544_Settings *settings) {
   GPIO_OUTPUT_SET(pinSdin, LOW);
   GPIO_OUTPUT_SET(pinSclk, LOW);
 
-  PCD8544_initLCD(settings);
   PCD8544_isInitiated = true;
+  PCD8544_initLCD(settings);
 }
 
 /**
@@ -343,6 +340,7 @@ PCD8544_initLCD(PCD8544_Settings *settings) {
     PCD8544_lcdWrite8( LCD_CMD, 0x14 );  // LCD bias mode 1:48. //0x13
     PCD8544_lcdWrite8( LCD_CMD, 0x0C );  // LCD in normal mode. 0x0d for inverse
   }
+
   PCD8544_lcdWrite8( LCD_CMD, 0x20);
   PCD8544_lcdWrite8( LCD_CMD, 0x0C);
   os_delay_us(100000);

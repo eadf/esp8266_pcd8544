@@ -10,7 +10,6 @@
 #ifndef INCLUDE_DRIVER_PCD8544_H_
 #define INCLUDE_DRIVER_PCD8544_H_
 
-#include "ctype.h"
 #include "c_types.h"
 
 typedef struct {
