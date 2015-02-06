@@ -21,3 +21,9 @@ All of the pins are configurable, you just set the pins you want to use in the s
 I don't know if it is required but i put 1KΩ resistors on each GPIO pin, and it does not seem to cause any problems. 
 
 Take a look at [esp_mqtt_lcd](https://github.com/eadf/esp_mqtt_lcd) to see an example on how this project can be used as a library module (git subtree) in your own project.
+
+###Required:
+
+esp_iot_sdk_v0.9.4_14_12_19
+
+I have not tested this with v0.9.5. I tested a [clean sdk 0.9.5 install](https://github.com/pfalcon/esp-open-sdk) with one of the basic examples ([blinky](https://github.com/esp8266/source-code-examples)). It compiled and uploaded fine but the esp had a infinite crash loop with some message about "MEM CHK FAIL" on the console. So i threw the whole sdk out (aint nobody got time fo dat). I will try upgrading the sdk again once [mqtt](https://github.com/tuanpmt/esp_mqtt) upgrades to 0.9.5+.
