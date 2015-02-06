@@ -10,9 +10,6 @@
 BUILD_BASE	= build
 FW_BASE		= firmware
 
-# Base directory for the compiler
-XTENSA_TOOLS_ROOT ?= /opt/Espressif/crosstool-NG/builds/xtensa-lx106-elf/bin
-
 # base directory of the ESP8266 SDK package, absolute
 SDK_BASE	?= /opt/Espressif/ESP8266_SDK
 
@@ -52,9 +49,9 @@ FW_FILE_2	= 0x40000
 FW_FILE_2_ARGS	= -es .irom0.text $@ -ec
 
 # select which tools to use as compiler, librarian and linker
-CC		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-gcc
-AR		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-ar
-LD		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-gcc
+CC		:= xtensa-lx106-elf-gcc
+AR		:= xtensa-lx106-elf-ar
+LD		:= xtensa-lx106-elf-gcc
 
 ####
 #### no user configurable options below here
@@ -128,10 +125,8 @@ firmware:
 	$(Q) mkdir -p $@
 
 flash: firmware/0x00000.bin firmware/0x40000.bin
-	#$(PYTHON) ~/Develop/workspace-arduino/ProMiniBootloader/upload.py /dev/ttyACM0 9600 bypass reset 
 	$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x3C000 $(BLANKER) 0x40000 firmware/0x40000.bin 
 	#$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x40000 firmware/0x40000.bin 
-	#$(PYTHON) ~/Develop/workspace-arduino/ProMiniBootloader/upload.py /dev/ttyACM0 9600 normal
 
 test: flash
 	screen $(ESPPORT) 115200
