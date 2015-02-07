@@ -8,7 +8,6 @@
 # Output directors to store intermediate compiled files
 # relative to the project directory
 BUILD_BASE	= build
-FW_BASE		= firmware
 
 # base directory of the ESP8266 SDK package, absolute
 SDK_BASE	?= /opt/Espressif/ESP8266_SDK
@@ -43,10 +42,8 @@ SDK_INCDIR	= include include/json
 
 # we create two different files for uploading into the flash
 # these are the names and options to generate them
-FW_FILE_1	= 0x00000
-FW_FILE_1_ARGS	= -bo $@ -bs .text -bs .data -bs .rodata -bc -ec
-FW_FILE_2	= 0x40000
-FW_FILE_2_ARGS	= -es .irom0.text $@ -ec
+FW_FILE_1	= ${TARGET_OUT}-0x00000.bin
+FW_FILE_2	= ${TARGET_OUT}-0x40000.bin
 
 # select which tools to use as compiler, librarian and linker
 CC		:= xtensa-lx106-elf-gcc
@@ -56,7 +53,6 @@ LD		:= xtensa-lx106-elf-gcc
 ####
 #### no user configurable options below here
 ####
-FW_TOOL		?= /usr/bin/esptool
 SRC_DIR		:= $(MODULES)
 BUILD_DIR	:= $(addprefix $(BUILD_BASE)/,$(MODULES))
 
@@ -75,9 +71,7 @@ INCDIR	:= $(addprefix -I,$(SRC_DIR))
 EXTRA_INCDIR	:= $(addprefix -I,$(EXTRA_INCDIR))
 MODULE_INCDIR	:= $(addsuffix /include,$(INCDIR))
 
-FW_FILE_1	:= $(addprefix $(FW_BASE)/,$(FW_FILE_1).bin)
-FW_FILE_2	:= $(addprefix $(FW_BASE)/,$(FW_FILE_2).bin)
-BLANKER	:= $(addprefix $(SDK_BASE)/,bin/blank.bin)
+BLANKER		:= $(addprefix $(SDK_BASE)/,bin/blank.bin)
 
 V ?= $(VERBOSE)
 ifeq ("$(V)","1")
@@ -98,15 +92,11 @@ endef
 
 .PHONY: all checkdirs clean
 
-all: checkdirs $(TARGET_OUT) $(FW_FILE_1) $(FW_FILE_2)
+all: checkdirs $(TARGET_OUT) $(FW_FILE_1) 
 
 $(FW_FILE_1): $(TARGET_OUT)
 	$(vecho) "FW $@"
-	$(Q) $(FW_TOOL) -eo $(TARGET_OUT) $(FW_FILE_1_ARGS)
-
-$(FW_FILE_2): $(TARGET_OUT)
-	$(vecho) "FW $@"
-	$(Q) $(FW_TOOL) -eo $(TARGET_OUT) $(FW_FILE_2_ARGS)
+	$(Q) $(ESPTOOL) elf2image $(TARGET_OUT) 
 
 $(TARGET_OUT): $(APP_AR)
 	$(vecho) "LD $@"
@@ -121,12 +111,8 @@ checkdirs: $(BUILD_DIR) $(FW_BASE)
 $(BUILD_DIR):
 	$(Q) mkdir -p $@
 
-firmware:
-	$(Q) mkdir -p $@
-
-flash: firmware/0x00000.bin firmware/0x40000.bin
-	$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x3C000 $(BLANKER) 0x40000 firmware/0x40000.bin 
-	#$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x40000 firmware/0x40000.bin 
+flash: $(FW_FILE_1) 
+	$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 $(FW_FILE_1) 0x3C000 $(BLANKER) 0x40000 $(FW_FILE_2) 
 
 test: flash
 	screen $(ESPPORT) 115200
