@@ -185,6 +185,7 @@ PCD8544_lcdPrint(char *characters) {
 void ICACHE_FLASH_ATTR
 PCD8544_lcdClear(void) {
   int index = 0;
+  PCD8544_gotoXY(0,0);
   for (; index < LCD_X * LCD_Y / 8; index++){
     PCD8544_lcdWrite8(LCD_DATA, 0x00);
   }
@@ -204,6 +205,7 @@ PCD8544_pixelAt(uint8_t *image, uint8_t x, uint8_t y) {
 void ICACHE_FLASH_ATTR
 PCD8544_lcdImage(uint8_t *image) {
   int index = 0;
+  PCD8544_gotoXY(0,0);
   for (; index < LCD_X * LCD_Y / 8; index++) {
     PCD8544_lcdWrite8(LCD_DATA, image[index]);
   }
