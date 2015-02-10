@@ -50,7 +50,7 @@ typedef enum {
  */
 bool easygpio_getGPIONameFunc(uint8_t gpio_pin, uint32_t *gpio_name, uint8_t *gpio_func);
 
-#ifndef INC_FREERTOS_H  // quick and dirty 'fix' for freertos interrupt differences
+#ifndef XT_RTOS_NAME  // quick and dirty 'fix' for freertos interrupt differences
 /**
  * Sets the 'gpio_pin' pin as a GPIO and sets the interrupt to trigger on that pin
  */
