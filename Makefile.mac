@@ -10,7 +10,7 @@
 BUILD_BASE	= build
 
 # base directory of the ESP8266 SDK package, absolute
-SDK_BASE	?= /opt/local/esp-open-sdk
+SDK_BASE	?= /opt/local/esp-open-sdk/sdk
 
 #Esptool.py path and port
 ESPTOOL		?= esptool.py
