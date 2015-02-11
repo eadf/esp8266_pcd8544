@@ -4,11 +4,19 @@
 
 #include "pcd8544/pcd8544.h"
 #include "easygpio/easygpio.h"
+#include "eagle_soc.h"
+#ifdef RTOS
+#include "pin_mux_register.h"
+#else
 #include "osapi.h"
 #include "ets_sys.h"
 #include "os_type.h"
 #include "gpio.h"
-#include "gpio.h"
+#endif
+#include "c_types.h"
+#include "ets_sys.h"
+//#include "os_type.h"
+#include "eagle_soc.h"
 
 // These default pin definitions can be changed to any valid GPIO pin.
 // The code in PCD8544_init() should automagically adapt

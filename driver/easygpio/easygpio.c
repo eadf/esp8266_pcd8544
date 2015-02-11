@@ -30,9 +30,32 @@
 */
 
 #include "easygpio/easygpio.h"
-#include "gpio.h"
+#include "eagle_soc.h"
+#ifdef RTOS
+#include "pin_mux_register.h"
+#else
 #include "osapi.h"
 #include "ets_sys.h"
+#include "gpio.h"
+#endif
+#include "ets_sys.h"
+
+#ifdef RTOS
+#include "gpio_register.h"
+// this is supposed to be defined in gpio.h, but since rtos does not include 
+// that file i have to make a dirty fix here.
+
+#define GPIO_AS_PIN_SOURCE                        0
+
+typedef enum {
+    GPIO_PIN_INTR_DISABLE = 0,
+    GPIO_PIN_INTR_POSEDGE = 1,
+    GPIO_PIN_INTR_NEGEDGE = 2,
+    GPIO_PIN_INTR_ANYEGDE = 3,
+    GPIO_PIN_INTR_LOLEVEL = 4,
+    GPIO_PIN_INTR_HILEVEL = 5
+} GPIO_INT_TYPE;
+#endif
 
 /**
  * Returns the number of active pins in the gpioMask.

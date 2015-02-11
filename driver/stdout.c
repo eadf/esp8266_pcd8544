@@ -10,7 +10,14 @@
  */
 #include "driver/stdout.h"
 #include "ets_sys.h"
+#include "eagle_soc.h"
+#ifdef RTOS
+#include "pin_mux_register.h"
+#else
 #include "osapi.h"
+#include "gpio.h"
+#endif
+#include "c_types.h"
 #include "driver/uart_hw.h"
 
 static void ICACHE_FLASH_ATTR stdoutUartTxd(char c) {

@@ -1,12 +1,16 @@
 
 
 #include "ets_sys.h"
-#include "osapi.h"
 #include "c_types.h"
+#ifndef RTOS
+#include "osapi.h"
 #include "gpio.h"
 #include "os_type.h"
-#include "user_config.h"
 #include "user_interface.h"
+#else
+#include "esp_timer.h"
+#endif
+#include "user_config.h"
 #include "driver/stdout.h"
 #include "pcd8544/pcd8544.h"
 

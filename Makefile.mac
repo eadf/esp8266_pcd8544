@@ -21,13 +21,13 @@ TARGET		= app
 
 # which modules (subdirectories) of the project to include in compiling
 MODULES        = driver driver/pcd8544 driver/easygpio user
-EXTRA_INCDIR    = include $(SDK_BASE)/../include
+EXTRA_INCDIR    = include $(SDK_BASE)/../include $(SDK_BASE)/include/espressif/esp8266 $(SDK_BASE)/include/espressif
 
 # libraries used in this project, mainly provided by the SDK
 LIBS		= c gcc hal phy pp net80211 lwip wpa upgrade main ssl
 
 # compiler flags using during compilation of source files
-CFLAGS		= -Os -O2 -Wpointer-arith -Wundef -Werror -Wmissing-prototypes -Wmissing-declarations -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals  -D__ets__ -DICACHE_FLASH
+CFLAGS		= -DRTOS -Os -O2 -Wpointer-arith -Wundef -Werror -Wmissing-prototypes -Wmissing-declarations -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals  -D__ets__ -DICACHE_FLASH
 
 # linker flags used to generate the main object file
 LDFLAGS		= -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
