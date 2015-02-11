@@ -175,8 +175,6 @@ easygpio_pinMode(uint8_t gpio_pin, EasyGPIO_PullStatus pullStatus, EasyGPIO_PinM
   return true;
 }
 
-#ifndef XT_RTOS_NAME  // quick and dirty 'fix' for freertos interrupt differences
-
 /**
  * Sets the 'gpio_pin' pin as a GPIO and sets the interrupt to trigger on that pin
  */
@@ -230,6 +228,4 @@ easygpio_detachInterrupt(uint8_t gpio_pin) {
   gpio_pin_intr_state_set(GPIO_ID_PIN(gpio_pin), GPIO_PIN_INTR_DISABLE);
   return true;
 }
-
-#endif
 
