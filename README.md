@@ -5,6 +5,8 @@ This is a direct port of code found at [arduino playground.](http://playground.a
 
 This git repository now only contains the the driver, the example code that used to be here is now moved to [pdc8544_example.](https://github.com/eadf/esp8266_pcd8544_example)
 
+Here is another example of how this module can be used: [esp_mqtt_lcd](https://github.com/eadf/esp_mqtt_lcd).
+
 Good news, the interface no longer requires 5 available GPIO outputs so an ESP-01 will indeed work. (But only if the RX pin of the esp is used.)
 
 The RST pin is optional, set it to a negative value and tie PCD8544 reset to ESP reset via a resistor.
